@@ -30,11 +30,12 @@ export class Jira extends DirectParseProvider {
         } else if (this.body.webhookEvent.startsWith('comment_')) {
             isIssue = false
             if(this.body.issue == null) {
-                // What's the point of notifying a new comment if ONLY comment information is sent?
-                // Do we care that a comment was made if we cant tell what was commented on?
-                // This solution will silence errors until someone makes sense of Atlassian's decisions..
-                this.nullifyPayload()
-                return
+                const comment = this.body.comment;
+                const action = this.body.webhookEvent.split("_")[1];
+                this.addEmbed({
+                    description: `${comment.updateAuthor.displayName} ${action} comment:\n\n${comment.body}`,
+                });
+                return;
             }
         } else {
             return
